@@ -109,7 +109,7 @@ class ShowCardDetails extends StatelessWidget {
           children: [
             AppKeyValueText(
               title: 'Number',
-              value: controller.cardDetails?.cardNumber ?? na,
+              value: controller.cardDetails?.cardNumber?.maskedCardNumber ?? na,
             ),
             AppKeyValueText(
               title: 'Expiry Date',

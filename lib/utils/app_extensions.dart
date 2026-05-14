@@ -100,6 +100,22 @@ extension StringExtension on String {
   //         ],
   //       ),
   //     );
+  String get maskedCardNumber {
+    final cleaned = replaceAll(' ', '');
+    if (cleaned.length < 4) return this;
+    final last4 = cleaned.substring(cleaned.length - 4);
+    final maskedLength = cleaned.length - 4;
+    final masked = List.generate(maskedLength, (_) => 'X').join();
+    final combined = masked + last4;
+    final buffer = StringBuffer();
+    for (int i = 0; i < combined.length; i++) {
+      buffer.write(combined[i]);
+      if ((i + 1) % 4 == 0 && i != combined.length - 1) {
+        buffer.write(' ');
+      }
+    }
+    return buffer.toString();
+  }
 }
 
   // void errorSnackbar() => showSnackbar(type: SnackbarType.error);
