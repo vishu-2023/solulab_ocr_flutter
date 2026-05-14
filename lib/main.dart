@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solulab_ocr_flutter/core/routes/app_pages.dart';
+import 'package:solulab_ocr_flutter/utils/app_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,14 +9,14 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       getPages: AppPages.routes,
+      initialRoute: Routes.HOME,
       initialBinding: BindingsX.initialBindings(),
+      theme: AppTheme.appDarkTheme,
     );
   }
 }

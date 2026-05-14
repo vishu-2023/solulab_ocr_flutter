@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:solulab_ocr_flutter/utils/app_colors.dart';
 
 List<BoxShadow> get containerShadow {
   return [
@@ -11,4 +12,10 @@ bool isNullEmptyOrFalse(dynamic o) {
     return o == null || o.length == 0;
   }
   return o == null || o == false || o == "";
+}
+
+Widget defaultLoader() {
+  return Builder(
+    builder: (context) => CircularProgressIndicator(strokeWidth: 2, color: primaryColor),
+  );
 }

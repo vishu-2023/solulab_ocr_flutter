@@ -158,13 +158,8 @@ class _AppButtonState extends State<AppButton> with SingleTickerProviderStateMix
 }
 
 class PrimaryButton extends StatelessWidget {
-  const PrimaryButton({
-    super.key,
-    required this.onPress,
-    required this.label,
-    this.isLoading = false,
-  });
-  final VoidCallback onPress;
+  const PrimaryButton({super.key, this.onPress, required this.label, this.isLoading = false});
+  final VoidCallback? onPress;
   final String label;
   final bool isLoading;
   @override
@@ -203,6 +198,7 @@ class SecondaryButton extends StatelessWidget {
       backgroundColor: Colors.transparent,
       labelColor: primaryColor,
       borderColor: primaryColor,
+      borderRadius: 12,
     );
   }
 }

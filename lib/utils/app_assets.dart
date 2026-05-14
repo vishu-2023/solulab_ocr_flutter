@@ -18,4 +18,6 @@ class AppIcons {
   static const buy = "$iconPath/plus.svg";
   static const send = "$iconPath/arrow-up.svg";
   static const recive = "$iconPath/arrow-down.svg";
+  static const passbook = "$iconPath/passbook.png";
+  static const card = "$iconPath/card.png";
 }

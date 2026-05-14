@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:solulab_ocr_flutter/utils/app_colors.dart';
 import 'package:solulab_ocr_flutter/utils/app_constant.dart';
 import 'package:solulab_ocr_flutter/utils/app_design_constant.dart';
 
@@ -29,7 +30,7 @@ extension WidgetExtension on Widget {
     width: isFullWidth ? double.infinity : null,
     decoration: BoxDecoration(
       border: border,
-      color: backgroundColor ?? Colors.white,
+      color: backgroundColor ?? secondaryColor,
       boxShadow: showShadow ? containerShadow : null,
       borderRadius: BorderRadius.circular(borderRadius),
     ),
