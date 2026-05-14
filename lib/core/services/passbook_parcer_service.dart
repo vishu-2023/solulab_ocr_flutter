@@ -45,36 +45,6 @@ class PassbookParser {
     'LUCKNOW',
     'KOLKATA',
   ];
-
-  // Common Indian Surnames for Name Triangulation
-  static const List<String> _commonSurnames = [
-    'PATEL',
-    'SHAH',
-    'DESAI',
-    'MEHTA',
-    'ADANI',
-    'BANERJEE',
-    'CHATTERJEE',
-    'MUKHERJEE',
-    'GHOSH',
-    'BOSE',
-    'SINGH',
-    'KAUR',
-    'MALHOTRA',
-    'KHANNA',
-    'ARORA',
-    'KULKARNI',
-    'DESHPANDE',
-    'PATIL',
-    'JOSHI',
-    'GUPTE',
-    'PILLAI',
-    'REDDY',
-    'NAIDU',
-    'MANI',
-    'IYER',
-  ];
-
   static BankDetails parsePassbook(String rawText) {
     // 1. Character-Level Normalization
     final normalizedText = rawText.toUpperCase().replaceAll('o', '0');
@@ -104,16 +74,34 @@ class PassbookParser {
 
   // ====================== IFSC (The Anchor) ======================
   static String? _extractIfsc(String text) {
-    // Strict RBI standard: 4 letters, 0 (or misread O), 6 alphanumeric
+    // 1. Strict RBI standard: 4 letters, 0 (or misread O), 6 alphanumeric
     // We allow 'O' in the 5th place and force it to '0' during extraction
     final match = RegExp(r'\b[A-Z]{4}[0O][A-Z0-9]{6}\b').firstMatch(text);
     if (match != null) {
-      String extracted = match.group(0)!;
-      // Force 5th character to '0' and replace remaining 'O's with '0's (branch codes are numeric)
+      return _cleanIfsc(match.group(0)!);
+    }
+
+    // 2. Fallback: Search near 'IFSC' label with relaxed constraints
+    final lines = text.split('\n');
+    for (final line in lines) {
+      if (line.contains('IFSC')) {
+        // Extract everything after 'IFSC' and remove non-alphanumeric chars
+        final afterIfsc = line.substring(line.indexOf('IFSC') + 4);
+        final cleaned = afterIfsc.replaceAll(RegExp(r'[^A-Z0-9]'), '');
+        if (cleaned.length >= 10 && cleaned.length <= 11) {
+          return _cleanIfsc(cleaned);
+        }
+      }
+    }
+    return null;
+  }
+
+  static String _cleanIfsc(String extracted) {
+    if (extracted.length == 11) {
       String rest = extracted.substring(5).replaceAll('O', '0');
       return extracted.substring(0, 4) + '0' + rest;
     }
-    return null;
+    return extracted;
   }
 
   // ====================== ACCOUNT NUMBER (Triangulated) ======================
@@ -198,6 +186,7 @@ class PassbookParser {
         upperLine.contains('CUSTOMER IDENTIFICATION') ||
         upperLine.contains('NOM REG NO') ||
         upperLine.contains('NOMINEE') ||
+        upperLine.contains('KYC IDENTIFIER') ||
         upperLine.contains('MICR')) {
       return;
     }
@@ -230,7 +219,9 @@ class PassbookParser {
       final upper = upperLines[i];
 
       // Priority 1: Clear "Name" label
-      if (upper.contains('NAME') || upper.contains('HOLDER')) {
+      if (upper.contains('NAME') ||
+          upper.contains('HOLDER') ||
+          upper.contains('CUSTOMER NAME')) {
         // Try to get text after colon or hyphen
         final parts = line.split(RegExp(r'[:\-]+'));
         if (parts.length > 1) {

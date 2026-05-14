@@ -18,14 +18,13 @@ class CameraView extends StatelessWidget {
     return GetBuilder<CameraViewController>(
       builder: (controller) {
         return Scaffold(
-          backgroundColor: Colors.black,
           body:
-              (controller.cameraController == null ||
+              (isNullEmptyOrFalse(controller.cameraController) ||
                   !controller.cameraController!.value.isInitialized)
               ? Center(child: defaultLoader())
               : Stack(
                   children: [
-                    SizedBox.expand(
+                    Center(
                       child: FittedBox(
                         fit: BoxFit.cover,
                         child: SizedBox(

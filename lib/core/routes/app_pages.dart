@@ -5,17 +5,24 @@ import 'package:solulab_ocr_flutter/designs/screens/home/home_view.dart';
 import 'package:solulab_ocr_flutter/designs/screens/home/home_view_controller.dart';
 import 'package:solulab_ocr_flutter/designs/screens/images_view/image_view.dart';
 import 'package:solulab_ocr_flutter/designs/screens/images_view/image_view_controller.dart';
+import 'package:solulab_ocr_flutter/designs/screens/splash_view.dart';
 
 part 'app_routes.dart';
 
 class AppPages {
-  static final List<GetPage<dynamic>> routes = [..._onlineRoutes, ..._offlineRoutes];
+  static final List<GetPage<dynamic>> routes = [
+    ..._onlineRoutes,
+    ..._offlineRoutes,
+  ];
   static List<GetPage<dynamic>> get _onlineRoutes {
     return [
+      GetPage(name: Routes.SPLASH, page: () => SplashView()),
       GetPage(
         name: Paths.HOME,
         page: () => const HomeView(),
-        binding: BindingsBuilder(() => Get.lazyPut<HomeViewController>(() => HomeViewController())),
+        binding: BindingsBuilder(
+          () => Get.lazyPut<HomeViewController>(() => HomeViewController()),
+        ),
       ),
       GetPage(
         name: Paths.CAMERA,

@@ -51,7 +51,11 @@ class CardParser {
     String? expiry = _extractExpiry(rawText);
     String? holderName = _extractHolderName(lines);
 
-    return CardDetails(cardNumber: cardNumber, expiryDate: expiry, cardHolderName: holderName);
+    return CardDetails(
+      cardNumber: cardNumber,
+      expiryDate: expiry,
+      cardHolderName: holderName,
+    );
   }
 
   // ─── CARD NUMBER ────────────────────────────────────────────────────────────
@@ -67,7 +71,9 @@ class CardParser {
       final match = cardRegex.firstMatch(line);
       if (match != null) {
         final number = match.group(0)!.replaceAll(RegExp(r'[^0-9]'), '');
-        if (number.length >= 13 && number.length <= 19 && LuhnValidator.isValidCard(number)) {
+        if (number.length >= 13 &&
+            number.length <= 19 &&
+            LuhnValidator.isValidCard(number)) {
           return number;
         }
       }
@@ -87,18 +93,24 @@ class CardParser {
   // ─── EXPIRY DATE ─────────────────────────────────────────────────────────────
 
   static String? _extractExpiry(String rawText) {
-    // Handles: 07/26, 07-26, 07/2026, 0726
-    final expiryRegex = RegExp(r'\b(0[1-9]|1[0-2])[\/\-](\d{2}|\d{4})\b');
-    final match = expiryRegex.firstMatch(rawText);
-    if (match != null) return match.group(0);
-
-    // Fallback: look for VALID THRU pattern and grab nearby date
+    // 1. Explicit keyword search (VALID THRU, EXPIRES)
     final validThruRegex = RegExp(
-      r'(?:VALID\s*(?:THRU|THROUGH|TILL)?)\s*(\d{2}[\/\-]\d{2,4})',
+      r'(?:VALID\s*(?:THRU|THROUGH|TILL)?|EXPIRES)\s*[\:\-]?\s*(\d{2}[\/\-]\d{2,4})',
       caseSensitive: false,
     );
     final validMatch = validThruRegex.firstMatch(rawText);
     if (validMatch != null) return validMatch.group(1);
+
+    // 2. Extract all date-like patterns
+    // Handles: 07/26, 07-26, 07/2026
+    final expiryRegex = RegExp(r'\b(0[1-9]|1[0-2])[\/\-](\d{2}|\d{4})\b');
+    final matches = expiryRegex.allMatches(rawText).toList();
+
+    if (matches.isNotEmpty) {
+      // If there are multiple dates (e.g., Issue Date & Expiry Date),
+      // the expiry date is typically the last one printed.
+      return matches.last.group(0);
+    }
 
     return null;
   }
@@ -125,7 +137,9 @@ class CardParser {
   static String? _extractNameNearValidThru(List<String> lines) {
     for (int i = 0; i < lines.length; i++) {
       final line = lines[i].toUpperCase();
-      if (line.contains('VALID') || line.contains('THRU') || line.contains('EXPIRES')) {
+      if (line.contains('VALID') ||
+          line.contains('THRU') ||
+          line.contains('EXPIRES')) {
         // Check next 1-2 lines for a name
         for (int j = i + 1; j <= i + 2 && j < lines.length; j++) {
           final candidate = _validateNameLine(lines[j]);
@@ -156,7 +170,10 @@ class CardParser {
 
   /// Strategy 2: Lines starting with "NAME:" or "CARD HOLDER:" etc.
   static String? _extractNameFromKeyword(List<String> lines) {
-    final keywordRegex = RegExp(r'^(?:NAME|CARD\s*HOLDER|HOLDER)[:\s]+(.+)$', caseSensitive: false);
+    final keywordRegex = RegExp(
+      r'^(?:NAME|CARD\s*HOLDER|HOLDER)[:\s]+(.+)$',
+      caseSensitive: false,
+    );
     for (final line in lines) {
       final match = keywordRegex.firstMatch(line.trim());
       if (match != null) {
