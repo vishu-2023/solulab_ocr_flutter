@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:camera/camera.dart';
 import 'package:get/get.dart';
 import 'package:solulab_ocr_flutter/core/models/image_preview_screen_argument.dart';
@@ -18,7 +20,11 @@ class CameraViewController extends GetxController {
   Future<void> initCamera() async {
     await tryOrCatch(() async {
       final cameras = await availableCameras();
-      cameraController = CameraController(cameras.first, ResolutionPreset.max, enableAudio: false);
+      cameraController = CameraController(
+        cameras.first,
+        ResolutionPreset.max,
+        enableAudio: false,
+      );
       await cameraController!.initialize();
       update();
     });
@@ -28,15 +34,24 @@ class CameraViewController extends GetxController {
     await tryOrCatch(() async {
       isImageCapturing.value = true;
       capturedImage = await cameraController?.takePicture();
-      Get.offNamed(
-        Routes.IMAGE_VIEW,
-        arguments: ImagePreviewScreenArgument(
-          capturedImage: capturedImage?.path,
-          scanType: Get.arguments as ScanType,
-        ),
-      );
+      update();
       isImageCapturing.value = false;
     });
+  }
+
+  void onRetake() {
+    capturedImage = null;
+    update();
+  }
+
+  void onConfirm() {
+    Get.offNamed(
+      Routes.IMAGE_VIEW,
+      arguments: ImagePreviewScreenArgument(
+        capturedImage: capturedImage?.path,
+        scanType: Get.arguments as ScanType,
+      ),
+    );
   }
 
   @override

@@ -17,10 +17,12 @@ class ImageView extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(title: const Text('Image View'), centerTitle: true),
-          bottomNavigationBar: CancelSubmitButtons(
-            onSubmit: () => Get.offAllNamed(Routes.HOME),
-            useSafeArea: true,
-          ),
+          bottomNavigationBar: SafeArea(
+            child: PrimaryButton(
+              label: "Go to Home",
+              onPress: () => Get.offAllNamed(Routes.HOME),
+            ),
+          ).paddingSymmetric(horizontal: 16, vertical: context.bottomPadding),
           body: controller.isAnalyzing
               ? Center(child: defaultLoader())
               : Column(
@@ -48,8 +50,14 @@ class ShowCardDetails extends StatelessWidget {
       builder: (controller) {
         return Column(
           children: [
-            AppKeyValueText(title: 'Number', value: controller.cardDetails?.cardNumber ?? na),
-            AppKeyValueText(title: 'Expiry Date', value: controller.cardDetails?.expiryDate ?? na),
+            AppKeyValueText(
+              title: 'Number',
+              value: controller.cardDetails?.cardNumber ?? na,
+            ),
+            AppKeyValueText(
+              title: 'Expiry Date',
+              value: controller.cardDetails?.expiryDate ?? na,
+            ),
             AppKeyValueText(
               title: 'Card Holder',
               value: controller.cardDetails?.cardHolderName ?? na,
@@ -75,7 +83,10 @@ class ShowPassbookDetail extends StatelessWidget {
               title: 'Account Number',
               value: controller.bankDetails?.accountNumber ?? na,
             ),
-            AppKeyValueText(title: 'IFSC Code', value: controller.bankDetails?.ifscCode ?? na),
+            AppKeyValueText(
+              title: 'IFSC Code',
+              value: controller.bankDetails?.ifscCode ?? na,
+            ),
             AppKeyValueText(
               title: 'Account Holder Name',
               value: controller.bankDetails?.accountHolderName ?? na,
